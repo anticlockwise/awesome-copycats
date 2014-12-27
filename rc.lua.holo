@@ -50,6 +50,8 @@ end
 
 run_once("urxvtd")
 run_once("unclutter")
+run_once("compton")
+run_once("sogou-qimpanel")
 -- }}}
 
 -- {{{ Variable definitions
@@ -62,16 +64,15 @@ beautiful.init(os.getenv("HOME") .. "/.config/awesome/themes/holo/theme.lua")
 -- common
 modkey     = "Mod4"
 altkey     = "Mod1"
-terminal   = "urxvtc" or "xterm"
+terminal   = "gnome-terminal"
 editor     = os.getenv("EDITOR") or "nano" or "vi"
 editor_cmd = terminal .. " -e " .. editor
 
 -- user defined
 browser    = "dwb"
-browser2   = "iron"
 gui_editor = "gvim"
 graphics   = "gimp"
-musiplr   = terminal .. " -e ncmpcpp "
+musiplr   = terminal .. " -e mocp "
 
 local layouts = {
     awful.layout.suit.floating,
@@ -166,21 +167,21 @@ pause_icon:set_image(beautiful.pause)
 play_pause_icon = wibox.widget.imagebox()
 play_pause_icon:set_image(beautiful.play)
 
-mpdwidget = lain.widgets.mpd({
+mocwidget = lain.widgets.moc({
     settings = function ()
-        if mpd_now.state == "play" then
-            mpd_now.artist = mpd_now.artist:upper():gsub("&.-;", string.lower)
-            mpd_now.title = mpd_now.title:upper():gsub("&.-;", string.lower)
+        if moc_now.state == "PLAY" then
+            moc_now.artist = moc_now.artist:upper():gsub("&.-;", string.lower)
+            moc_now.title = moc_now.title:upper():gsub("&.-;", string.lower)
             widget:set_markup(markup.font("Tamsyn 4", " ")
                               .. markup.font("Tamsyn 8",
-                              mpd_now.artist
+                              moc_now.artist
                               .. " - " ..
-                              mpd_now.title
+                              moc_now.title
                               .. markup.font("Tamsyn 10", " ")))
             play_pause_icon:set_image(beautiful.pause)
-        elseif mpd_now.state == "pause" then
+        elseif moc_now.state == "PAUSE" then
             widget:set_markup(markup.font("Tamsyn 4", " ") ..
-                              markup.font("Tamsyn 8", "MPD PAUSED") ..
+                              markup.font("Tamsyn 8", "MOC PAUSED") ..
                               markup.font("Tamsyn 10", " "))
             play_pause_icon:set_image(beautiful.play)
         else
@@ -191,7 +192,7 @@ mpdwidget = lain.widgets.mpd({
 })
 
 musicwidget = wibox.widget.background()
-musicwidget:set_widget(mpdwidget)
+musicwidget:set_widget(mocwidget)
 musicwidget:set_bgimage(beautiful.widget_bg)
 musicwidget:buttons(awful.util.table.join(awful.button({ }, 1,
 function () awful.util.spawn_with_shell(musicplr) end)))
@@ -199,28 +200,29 @@ mpd_icon:buttons(awful.util.table.join(awful.button({ }, 1,
 function () awful.util.spawn_with_shell(musicplr) end)))
 prev_icon:buttons(awful.util.table.join(awful.button({}, 1,
 function ()
-    awful.util.spawn_with_shell("mpc prev || ncmpc prev || pms prev")
-    mpdwidget.update()
+    awful.util.spawn_with_shell("mocp -r")
+    mocwidget.update()
 end)))
 next_icon:buttons(awful.util.table.join(awful.button({}, 1,
 function ()
-    awful.util.spawn_with_shell("mpc next || ncmpc next || pms next")
-    mpdwidget.update()
+    awful.util.spawn_with_shell("mocp -f")
+    mocwidget.update()
 end)))
 stop_icon:buttons(awful.util.table.join(awful.button({}, 1,
 function ()
     play_pause_icon:set_image(beautiful.play)
-    awful.util.spawn_with_shell("mpc stop || ncmpc stop || pms stop")
-    mpdwidget.update()
+    awful.util.spawn_with_shell("mocp -s")
+    mocwidget.update()
 end)))
 play_pause_icon:buttons(awful.util.table.join(awful.button({}, 1,
 function ()
-    awful.util.spawn_with_shell("mpc toggle || ncmpc toggle || pms toggle")
-    mpdwidget.update()
+    awful.util.spawn_with_shell("mocp -G")
+    mocwidget.update()
 end)))
 
 -- Battery
 batwidget = lain.widgets.bat({
+    battery = "BAT1",
     settings = function()
         bat_header = " Bat "
         bat_p      = bat_now.perc .. " "
@@ -236,6 +238,7 @@ batwidget = lain.widgets.bat({
 
 -- ALSA volume bar
 myvolumebar = lain.widgets.alsabar({
+    channel = "-D pulse Master",
     ticks  = true,
     width  = 80,
     height = 10,
@@ -286,7 +289,7 @@ networkwidget:set_widget(netwidget)
 networkwidget:set_bgimage(beautiful.widget_bg)
 
 -- Weather
-yawn = lain.widgets.yawn(123456)
+yawn = lain.widgets.yawn(2490383)
 
 -- Separators
 first = wibox.widget.textbox('<span font="Tamsyn 4"> </span>')
@@ -585,22 +588,22 @@ globalkeys = awful.util.table.join(
     awful.key({ altkey, "Control" }, "Up",
         function ()
             awful.util.spawn_with_shell("mpc toggle || ncmpc toggle || pms toggle")
-            mpdwidget.update()
+            mocwidget.update()
         end),
     awful.key({ altkey, "Control" }, "Down",
         function ()
             awful.util.spawn_with_shell("mpc stop || ncmpc stop || pms stop")
-            mpdwidget.update()
+            mocwidget.update()
         end),
     awful.key({ altkey, "Control" }, "Left",
         function ()
             awful.util.spawn_with_shell("mpc prev || ncmpc prev || pms prev")
-            mpdwidget.update()
+            mocwidget.update()
         end),
     awful.key({ altkey, "Control" }, "Right",
         function ()
             awful.util.spawn_with_shell("mpc next || ncmpc next || pms next")
-            mpdwidget.update()
+            mocwidget.update()
         end),
 
     -- Copy to clipboard
@@ -608,7 +611,6 @@ globalkeys = awful.util.table.join(
 
     -- User programs
     awful.key({ modkey }, "q", function () awful.util.spawn(browser) end),
-    awful.key({ modkey }, "i", function () awful.util.spawn(browser2) end),
     awful.key({ modkey }, "s", function () awful.util.spawn(gui_editor) end),
     awful.key({ modkey }, "g", function () awful.util.spawn(graphics) end),
 
