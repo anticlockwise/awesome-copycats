@@ -50,6 +50,8 @@ end
 
 run_once("urxvtd")
 run_once("unclutter")
+run_once("compton")
+run_once("sogou-qimpanel")
 -- }}}
 
 -- {{{ Variable definitions
@@ -62,16 +64,15 @@ beautiful.init(os.getenv("HOME") .. "/.config/awesome/themes/multicolor/theme.lu
 -- common
 modkey     = "Mod4"
 altkey     = "Mod1"
-terminal   = "urxvtc" or "xterm"
+terminal   = "gnome-terminal"
 editor     = os.getenv("EDITOR") or "nano" or "vi"
 editor_cmd = terminal .. " -e " .. editor
 
 -- user defined
 browser    = "dwb"
-browser2   = "iron"
 gui_editor = "gvim"
 graphics   = "gimp"
-mail       = terminal .. " -e mutt "
+mail       = terminal .. " -e mutt-256color "
 
 local layouts = {
     awful.layout.suit.floating,
@@ -123,7 +124,7 @@ lain.widgets.calendar:attach(mytextclock, { font_size = 10 })
 
 -- Weather
 weathericon = wibox.widget.imagebox(beautiful.widget_weather)
-yawn = lain.widgets.yawn(123456, {
+yawn = lain.widgets.yawn(2490383, {
     settings = function()
         widget:set_markup(markup("#eca4c4", forecast:lower() .. " @ " .. units .. "°C "))
     end
@@ -137,15 +138,13 @@ fswidget = lain.widgets.fs({
     end
 })
 
---[[ Mail IMAP check
--- commented because it needs to be set before use
 mailicon = wibox.widget.imagebox()
 mailicon:buttons(awful.util.table.join(awful.button({ }, 1, function () awful.util.spawn(mail) end)))
 mailwidget = lain.widgets.imap({
-    timeout  = 180,
-    server   = "server",
-    mail     = "mail",
-    password = "keyring get mail",
+    timeout  = 5,
+    server   = "imap.gmail.com",
+    mail     = "anticlockwise5@gmail.com",
+    password = "keyring get gmail anticlockwise5@gmail.com",
     settings = function()
         if mailcount > 0 then
             mailicon:set_image(beautiful.widget_mail)
@@ -156,7 +155,6 @@ mailwidget = lain.widgets.imap({
         end
     end
 })
-]]
 
 -- CPU
 cpuicon = wibox.widget.imagebox()
@@ -178,6 +176,7 @@ tempwidget = lain.widgets.temp({
 -- Battery
 baticon = wibox.widget.imagebox(beautiful.widget_batt)
 batwidget = lain.widgets.bat({
+    battery = "BAT1",
     settings = function()
         if bat_now.perc == "N/A" then
             bat_now.perc = "AC "
@@ -191,6 +190,7 @@ batwidget = lain.widgets.bat({
 -- ALSA volume
 volicon = wibox.widget.imagebox(beautiful.widget_vol)
 volumewidget = lain.widgets.alsa({
+    channel = "-D pulse Master",
     settings = function()
         if volume_now.status == "off" then
             volume_now.level = volume_now.level .. "M"
@@ -228,25 +228,25 @@ memwidget = lain.widgets.mem({
 })
 
 -- MPD
-mpdicon = wibox.widget.imagebox()
-mpdwidget = lain.widgets.mpd({
+mocicon = wibox.widget.imagebox()
+mocwidget = lain.widgets.contrib.moc({
     settings = function()
-        mpd_notification_preset = {
-            text = string.format("%s [%s] - %s\n%s", mpd_now.artist,
-                   mpd_now.album, mpd_now.date, mpd_now.title)
+        moc_notification_preset = {
+            text = string.format("%s [%s] - %s\n%s", moc_now.artist,
+                   moc_now.album, moc_now.total, moc_now.title)
         }
 
-        if mpd_now.state == "play" then
-            artist = mpd_now.artist .. " > "
-            title  = mpd_now.title .. " "
-            mpdicon:set_image(beautiful.widget_note_on)
-        elseif mpd_now.state == "pause" then
-            artist = "mpd "
+        if moc_now.state == "PLAY" then
+            artist = moc_now.artist .. " > "
+            title  = moc_now.title .. " "
+            mocicon:set_image(beautiful.widget_note_on)
+        elseif moc_now.state == "PAUSE" then
+            artist = "moc "
             title  = "paused "
         else
             artist = ""
             title  = ""
-            mpdicon:set_image(nil)
+            mocicon:set_image(nil)
         end
         widget:set_markup(markup("#e54c62", artist) .. markup("#b2b2b2", title))
     end
@@ -336,14 +336,14 @@ for s = 1, screen.count() do
     local left_layout = wibox.layout.fixed.horizontal()
     left_layout:add(mytaglist[s])
     left_layout:add(mypromptbox[s])
-    left_layout:add(mpdicon)
-    left_layout:add(mpdwidget)
+    left_layout:add(mocicon)
+    left_layout:add(mocwidget)
 
     -- Widgets that are aligned to the upper right
     local right_layout = wibox.layout.fixed.horizontal()
     if s == 1 then right_layout:add(wibox.widget.systray()) end
-    --right_layout:add(mailicon)
-    --right_layout:add(mailwidget)
+    right_layout:add(mailicon)
+    right_layout:add(mailwidget)
     right_layout:add(netdownicon)
     right_layout:add(netdowninfo)
     right_layout:add(netupicon)
@@ -501,45 +501,45 @@ globalkeys = awful.util.table.join(
     -- ALSA volume control
     awful.key({ altkey }, "Up",
         function ()
-            awful.util.spawn("amixer -q set Master 1%+")
+            awful.util.spawn("amixer -q set -D pulse Master 1%+")
             volumewidget.update()
         end),
     awful.key({ altkey }, "Down",
         function ()
-            awful.util.spawn("amixer -q set Master 1%-")
+            awful.util.spawn("amixer -q set -D pulse Master 1%-")
             volumewidget.update()
         end),
     awful.key({ altkey }, "m",
         function ()
-            awful.util.spawn("amixer -q set Master playback toggle")
+            awful.util.spawn("amixer -q set -D pulse Master playback toggle")
             volumewidget.update()
         end),
     awful.key({ altkey, "Control" }, "m",
         function ()
-            awful.util.spawn("amixer -q set Master playback 100%")
+            awful.util.spawn("amixer -q set -D pulse Master playback 100%")
             volumewidget.update()
         end),
 
     -- MPD control
     awful.key({ altkey, "Control" }, "Up",
         function ()
-            awful.util.spawn_with_shell("mpc toggle || ncmpc toggle || pms toggle")
-            mpdwidget.update()
+            awful.util.spawn_with_shell("mocp -G")
+            mocwidget.update()
         end),
     awful.key({ altkey, "Control" }, "Down",
         function ()
-            awful.util.spawn_with_shell("mpc stop || ncmpc stop || pms stop")
-            mpdwidget.update()
+            awful.util.spawn_with_shell("mocp -s")
+            mocwidget.update()
         end),
     awful.key({ altkey, "Control" }, "Left",
         function ()
-            awful.util.spawn_with_shell("mpc prev || ncmpc prev || pms prev")
-            mpdwidget.update()
+            awful.util.spawn_with_shell("mocp -r")
+            mocwidget.update()
         end),
     awful.key({ altkey, "Control" }, "Right",
         function ()
-            awful.util.spawn_with_shell("mpc next || ncmpc next || pms next")
-            mpdwidget.update()
+            awful.util.spawn_with_shell("mocp -f")
+            mocwidget.update()
         end),
 
     -- Copy to clipboard
@@ -547,7 +547,6 @@ globalkeys = awful.util.table.join(
 
     -- User programs
     awful.key({ modkey }, "q", function () awful.util.spawn(browser) end),
-    awful.key({ modkey }, "i", function () awful.util.spawn(browser2) end),
     awful.key({ modkey }, "s", function () awful.util.spawn(gui_editor) end),
     awful.key({ modkey }, "g", function () awful.util.spawn(graphics) end),
 

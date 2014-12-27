@@ -50,6 +50,8 @@ end
 
 run_once("urxvtd")
 run_once("unclutter")
+run_once("compton")
+run_once("sogou-qimpanel")
 -- }}}
 
 -- {{{ Variable definitions
@@ -62,13 +64,12 @@ beautiful.init(os.getenv("HOME") .. "/.config/awesome/themes/rainbow/theme.lua")
 -- common
 modkey     = "Mod4"
 altkey     = "Mod1"
-terminal   = "urxvtc" or "xterm"
+terminal   = "gnome-terminal"
 editor     = os.getenv("EDITOR") or "nano" or "vi"
 editor_cmd = terminal .. " -e " .. editor
 
 -- user defined
 browser    = "dwb"
-browser2   = "iron"
 gui_editor = "gvim"
 graphics   = "gimp"
 
@@ -123,13 +124,11 @@ mytextclock = awful.widget.textclock(markup.font("Tamsyn 3", " ") ..
 -- Calendar
 lain.widgets.calendar:attach(mytextclock, { fg = beautiful.fg_focus })
 
---[[ Mail IMAP check
--- commented because it needs to be set before use
 mailwidget = lain.widgets.imap({
-    timeout  = 180,
-    server   = "server",
-    mail     = "mail",
-    password = "keyring get mail",
+    timeout  = 5,
+    server   = "imap.gmail.com",
+    mail     = "anticlockwise5@gmail.com",
+    password = "keyring get gmail anticlockwise5@gmail.com",
     settings = function()
         mail_notification_preset.fg = white
 
@@ -144,20 +143,19 @@ mailwidget = lain.widgets.imap({
         widget:set_markup(markup(gray, mail) .. markup(white, count))
     end
 })
-]]
 
 -- MPD
-mpdwidget = lain.widgets.mpd({
+mocwidget = lain.widgets.contrib.moc({
     settings = function()
-        mpd_notification_preset.fg = white
+        moc_notification_preset.fg = white
 
-        artist = mpd_now.artist .. " "
-        title  = mpd_now.title  .. " "
+        artist = moc_now.artist .. " "
+        title  = moc_now.title  .. " "
 
-        if mpd_now.state == "pause" then
-            artist = "mpd "
+        if moc_now.state == "PAUSE" then
+            artist = "moc "
             title  = "paused "
-        elseif mpd_now.state == "stop" then
+        elseif moc_now.state == "STOP" then
             artist = ""
             title  = ""
         end
@@ -185,7 +183,7 @@ fshome = lain.widgets.fs({
 })
 
 -- ALSA volume bar
-volume = lain.widgets.alsabar({ ticks = true })
+volume = lain.widgets.alsabar({ channel = "-D pulse Master", ticks = true })
 volmargin = wibox.layout.margin(volume.bar, 5, 8, 80)
 volmargin:set_top(7)
 volmargin:set_bottom(7)
@@ -193,7 +191,7 @@ volumewidget = wibox.widget.background(volmargin)
 volumewidget:set_bgimage(beautiful.vol_bg)
 
 -- Weather
-yawn = lain.widgets.yawn(123456,
+yawn = lain.widgets.yawn(2490383,
 {
     settings = function()
         yawn_notification_preset.fg = white
@@ -300,8 +298,8 @@ for s = 1, screen.count() do
     local right_layout = wibox.layout.fixed.horizontal()
     if s == 1 then right_layout:add(wibox.widget.systray()) end
     right_layout:add(small_spr)
-    right_layout:add(mpdwidget)
-    --right_layout:add(mailwidget)
+    right_layout:add(mocwidget)
+    right_layout:add(mailwidget)
     right_layout:add(fshome)
     right_layout:add(med_spr)
     right_layout:add(volumewidget)
@@ -450,23 +448,23 @@ globalkeys = awful.util.table.join(
     -- MPD control
     awful.key({ altkey, "Control" }, "Up",
         function ()
-            awful.util.spawn_with_shell("mpc toggle || ncmpc toggle || pms toggle")
-            mpdwidget.update()
+            awful.util.spawn_with_shell("mocp -G")
+            mocwidget.update()
         end),
     awful.key({ altkey, "Control" }, "Down",
         function ()
-            awful.util.spawn_with_shell("mpc stop || ncmpc stop || pms stop")
-            mpdwidget.update()
+            awful.util.spawn_with_shell("mocp -s")
+            mocwidget.update()
         end),
     awful.key({ altkey, "Control" }, "Left",
         function ()
-            awful.util.spawn_with_shell("mpc prev || ncmpc prev || pms prev")
-            mpdwidget.update()
+            awful.util.spawn_with_shell("mocp -r")
+            mocwidget.update()
         end),
     awful.key({ altkey, "Control" }, "Right",
         function ()
-            awful.util.spawn_with_shell("mpc next || ncmpc next || pms next")
-            mpdwidget.update()
+            awful.util.spawn_with_shell("mocp -f")
+            mocwidget.update()
         end),
 
     -- Copy to clipboard
@@ -474,7 +472,6 @@ globalkeys = awful.util.table.join(
 
     -- User programs
     awful.key({ modkey }, "q", function () awful.util.spawn(browser) end),
-    awful.key({ modkey }, "i", function () awful.util.spawn(browser2) end),
     awful.key({ modkey }, "s", function () awful.util.spawn(gui_editor) end),
     awful.key({ modkey }, "g", function () awful.util.spawn(graphics) end),
 
