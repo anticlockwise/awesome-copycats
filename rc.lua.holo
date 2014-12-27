@@ -131,15 +131,12 @@ calendarwidget:set_widget(mytextcalendar)
 calendarwidget:set_bgimage(beautiful.widget_bg)
 lain.widgets.calendar:attach(calendarwidget, { fg = "#FFFFFF", position = "bottom_right" })
 
---[[ Mail IMAP check
--- commented because it needs to be set before use
 mailwidget = lain.widgets.imap({
-    timeout  = 180,
-    server   = "server",
-    mail     = "mail",
-    password = "keyring get mail",
+    timeout  = 5,
+    server   = "imap.gmail.com",
+    mail     = "anticlockwise5@gmail.com",
+    password = "keyring get gmail anticlockwise5@gmail.com",
     settings = function()
-        mail_notification_preset.fg = "#FFFFFF"
         mail  = ""
         count = ""
 
@@ -148,14 +145,15 @@ mailwidget = lain.widgets.imap({
             count = mailcount .. " "
         end
 
-        widget:set_markup(markup(blue, mail) .. markup("#FFFFFF", count))
+        widget:set_markup(markup(blue, mail) .. count)
     end
 })
-]]
+
+fswidget = lain.widgets.fs()
 
 -- MPD
-mpd_icon = wibox.widget.imagebox()
-mpd_icon:set_image(beautiful.mpd)
+moc_icon = wibox.widget.imagebox()
+moc_icon:set_image(beautiful.mpd)
 prev_icon = wibox.widget.imagebox()
 prev_icon:set_image(beautiful.prev)
 next_icon = wibox.widget.imagebox()
@@ -196,7 +194,7 @@ musicwidget:set_widget(mocwidget)
 musicwidget:set_bgimage(beautiful.widget_bg)
 musicwidget:buttons(awful.util.table.join(awful.button({ }, 1,
 function () awful.util.spawn_with_shell(musicplr) end)))
-mpd_icon:buttons(awful.util.table.join(awful.button({ }, 1,
+moc_icon:buttons(awful.util.table.join(awful.button({ }, 1,
 function () awful.util.spawn_with_shell(musicplr) end)))
 prev_icon:buttons(awful.util.table.join(awful.button({}, 1,
 function ()
@@ -392,7 +390,7 @@ for s = 1, screen.count() do
     -- Widgets that are aligned to the upper right
     local right_layout = wibox.layout.fixed.horizontal()
     if s == 1 then right_layout:add(wibox.widget.systray()) end
-    --right_layout:add(mailwidget)
+    right_layout:add(mailwidget)
     right_layout:add(batwidget)
     right_layout:add(spr_right)
     right_layout:add(prev_icon)
@@ -400,7 +398,7 @@ for s = 1, screen.count() do
     right_layout:add(stop_icon)
     right_layout:add(play_pause_icon)
     right_layout:add(bar)
-    right_layout:add(mpd_icon)
+    right_layout:add(moc_icon)
     right_layout:add(musicwidget)
     right_layout:add(bar)
     right_layout:add(spr_very_small)
@@ -561,6 +559,7 @@ globalkeys = awful.util.table.join(
     -- Widgets popups
     awful.key({ altkey,           }, "c",      function () lain.widgets.calendar:show(7) end),
     awful.key({ altkey,           }, "w",      function () yawn.show(7) end),
+    awful.key({ altkey,           }, "h",      function () fswidget.show(7) end),
 
     -- ALSA volume control
     awful.key({ altkey }, "Up",
