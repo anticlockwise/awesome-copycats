@@ -128,13 +128,11 @@ mytextclock = awful.widget.textclock("<span font='Tamsyn 5'> </span>%H:%M ")
 -- Calendar
 lain.widgets.calendar:attach(mytextclock)
 
---[[ Mail IMAP check
--- commented because it needs to be set before use
 mailwidget = lain.widgets.imap({
-    timeout  = 180,
-    server   = "server",
-    mail     = "mail",
-    password = "keyring get mail",
+    timeout  = 5,
+    server   = "imap.gmail.com",
+    mail     = "anticlockwise5@gmail.com",
+    password = "keyring get gmail anticlockwise5@gmail.com",
     settings = function()
         mail  = ""
         count = ""
@@ -147,7 +145,6 @@ mailwidget = lain.widgets.imap({
         widget:set_markup(markup(blue, mail) .. count)
     end
 })
-]]
 
 -- MOC
 mocicon = wibox.widget.imagebox(beautiful.play)
@@ -351,7 +348,7 @@ for s = 1, screen.count() do
     right_layout:add(small_spr)
     right_layout:add(mocicon)
     right_layout:add(mocwidget)
-    --right_layout:add(mailwidget)
+    right_layout:add(mailwidget)
     right_layout:add(baticon)
     right_layout:add(batwidget)
     right_layout:add(bar_spr)
