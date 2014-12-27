@@ -50,6 +50,8 @@ end
 
 run_once("urxvtd")
 run_once("unclutter")
+run_once("compton")
+run_once("sogou_qimpanel")
 -- }}}
 
 -- {{{ Variable definitions
@@ -114,13 +116,11 @@ mytextclock = awful.widget.textclock(" %H:%M ")
 -- Calendar
 lain.widgets.calendar:attach(mytextclock)
 
---[[ Mail IMAP check
--- commented because it needs to be set before use
 mailwidget = lain.widgets.imap({
-    timeout  = 180,
-    server   = "server",
-    mail     = "mail",
-    password = "keyring get mail",
+    timeout  = 5,
+    server   = "imap.gmail.com",
+    mail     = "anticlockwise5@gmail.com",
+    password = "keyring get gmail anticlockwise5@gmail.com",
     settings = function()
         mail  = ""
         count = ""
@@ -133,18 +133,17 @@ mailwidget = lain.widgets.imap({
         widget:set_markup(markup(gray, mail) .. count)
     end
 })
-]]
 
 -- MPD
-mpdwidget = lain.widgets.mpd({
+mocwidget = lain.widgets.contrib.moc({
     settings = function()
-        artist = mpd_now.artist .. " "
-        title  = mpd_now.title  .. "  "
+        artist = moc_now.artist .. " "
+        title  = moc_now.title  .. "  "
 
-        if mpd_now.state == "pause" then
-            artist = "mpd "
+        if moc_now.state == "PAUSE" then
+            artist = "moc "
             title  = "paused  "
-        elseif mpd_now.state == "stop" then
+        elseif moc_now.state == "STOP" then
             artist = ""
             title  = ""
         end
@@ -171,6 +170,7 @@ fshome = lain.widgets.fs({
 
 -- Battery
 batwidget = lain.widgets.bat({
+    battery = "BAT1",
     settings = function()
         bat_header = " Bat "
         bat_p      = bat_now.perc .. " "
@@ -186,6 +186,7 @@ batwidget = lain.widgets.bat({
 
 -- ALSA volume
 volumewidget = lain.widgets.alsa({
+    channel = "-D pulse Master",
     settings = function()
         header = " Vol "
         level  = volume_now.level
@@ -201,7 +202,7 @@ volumewidget = lain.widgets.alsa({
 })
 
 -- Weather
-yawn = lain.widgets.yawn(123456,
+yawn = lain.widgets.yawn(2490383,
 {
     settings = function()
         widget:set_markup(" " .. units .. " ")
@@ -297,8 +298,8 @@ for s = 1, screen.count() do
     local right_layout = wibox.layout.fixed.horizontal()
     if s == 1 then right_layout:add(wibox.widget.systray()) end
     right_layout:add(first)
-    right_layout:add(mpdwidget)
-    --right_layout:add(mailwidget)
+    right_layout:add(mocwidget)
+    right_layout:add(mailwidget)
     right_layout:add(yawn.icon)
     right_layout:add(yawn.widget)
     right_layout:add(fshome)
@@ -452,23 +453,23 @@ globalkeys = awful.util.table.join(
     -- MPD control
     awful.key({ altkey, "Control" }, "Up",
         function ()
-            awful.util.spawn_with_shell("mpc toggle || ncmpc toggle || pms toggle")
-            mpdwidget.update()
+            awful.util.spawn_with_shell("mocp -G")
+            mocwidget.update()
         end),
     awful.key({ altkey, "Control" }, "Down",
         function ()
-            awful.util.spawn_with_shell("mpc stop || ncmpc stop || pms stop")
-            mpdwidget.update()
+            awful.util.spawn_with_shell("mocp -s")
+            mocwidget.update()
         end),
     awful.key({ altkey, "Control" }, "Left",
         function ()
-            awful.util.spawn_with_shell("mpc prev || ncmpc prev || pms prev")
-            mpdwidget.update()
+            awful.util.spawn_with_shell("mocp -r")
+            mocwidget.update()
         end),
     awful.key({ altkey, "Control" }, "Right",
         function ()
-            awful.util.spawn_with_shell("mpc next || ncmpc next || pms next")
-            mpdwidget.update()
+            awful.util.spawn_with_shell("mocp -f")
+            mocwidget.update()
         end),
 
     -- Copy to clipboard
