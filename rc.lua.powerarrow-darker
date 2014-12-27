@@ -143,7 +143,7 @@ mailwidget = wibox.widget.background(lain.widgets.imap({
 -- MPD
 mpdicon = wibox.widget.imagebox(beautiful.widget_music)
 mpdicon:buttons(awful.util.table.join(awful.button({ }, 1, function () awful.util.spawn_with_shell(musicplr) end)))
-mpdwidget = lain.widgets.moc({
+mpdwidget = lain.widgets.contrib.moc({
     settings = function()
         if moc_now.state == "PLAY" then
             artist = " " .. moc_now.artist .. " "
@@ -510,22 +510,22 @@ globalkeys = awful.util.table.join(
     -- MPD control
     awful.key({ altkey, "Control" }, "Up",
         function ()
-            awful.util.spawn_with_shell("mpc toggle || ncmpc toggle || pms toggle")
+            awful.util.spawn_with_shell("mocp -G")
             mpdwidget.update()
         end),
     awful.key({ altkey, "Control" }, "Down",
         function ()
-            awful.util.spawn_with_shell("mpc stop || ncmpc stop || pms stop")
+            awful.util.spawn_with_shell("mocp -s")
             mpdwidget.update()
         end),
     awful.key({ altkey, "Control" }, "Left",
         function ()
-            awful.util.spawn_with_shell("mpc prev || ncmpc prev || pms prev")
+            awful.util.spawn_with_shell("mocp -r")
             mpdwidget.update()
         end),
     awful.key({ altkey, "Control" }, "Right",
         function ()
-            awful.util.spawn_with_shell("mpc next || ncmpc next || pms next")
+            awful.util.spawn_with_shell("mocp -f")
             mpdwidget.update()
         end),
 

@@ -167,7 +167,7 @@ pause_icon:set_image(beautiful.pause)
 play_pause_icon = wibox.widget.imagebox()
 play_pause_icon:set_image(beautiful.play)
 
-mocwidget = lain.widgets.moc({
+mocwidget = lain.widgets.contrib.moc({
     settings = function ()
         if moc_now.state == "PLAY" then
             moc_now.artist = moc_now.artist:upper():gsub("&.-;", string.lower)

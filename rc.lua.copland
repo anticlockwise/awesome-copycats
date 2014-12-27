@@ -148,7 +148,7 @@ mailwidget = lain.widgets.imap({
 
 -- MOC
 mocicon = wibox.widget.imagebox(beautiful.play)
-mocwidget = lain.widgets.moc({
+mocwidget = lain.widgets.contrib.moc({
     settings = function()
         if moc_now.state == "PLAY" then
             title = moc_now.title
@@ -180,6 +180,7 @@ batmargin = wibox.layout.margin(batbar, 2, 7)
 batmargin:set_top(6)
 batmargin:set_bottom(6)
 batupd = lain.widgets.bat({
+    battery = "BAT1",
     settings = function()
         if bat_now.perc == "N/A" then
             bat_perc = 100
