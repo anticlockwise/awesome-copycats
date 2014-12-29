@@ -130,6 +130,11 @@ yawn = lain.widgets.yawn(2490383, {
     end
 })
 
+-- Task Warrior
+taskwidget = wibox.widget.textbox()
+lain.widgets.contrib.task:attach(taskwidget, {
+})
+
 -- / fs
 fsicon = wibox.widget.imagebox(beautiful.widget_fs)
 fswidget = lain.widgets.fs({
@@ -497,6 +502,9 @@ globalkeys = awful.util.table.join(
     awful.key({ altkey,           }, "c",      function () lain.widgets.calendar:show(7) end),
     awful.key({ altkey,           }, "h",      function () fswidget.show(7) end),
     awful.key({ altkey,           }, "w",      function () yawn.show(7) end),
+    awful.key({ modkey,           }, "t",      function () lain.widgets.contrib.task:prompt_add() end),
+    awful.key({ modkey, "Shift",  }, "t",      function () lain.widgets.contrib.task:prompt_search() end),
+    awful.key({ altkey,           }, "t",      function () lain.widgets.contrib.task:show() end),
 
     -- ALSA volume control
     awful.key({ altkey }, "Up",
