@@ -138,6 +138,7 @@ mailwidget = wibox.widget.background(lain.widgets.imap({
             mailicon:set_image(beautiful.widget_mail)
         end
     end
+}))
 
 -- MPD
 mpdicon = wibox.widget.imagebox(beautiful.widget_music)
