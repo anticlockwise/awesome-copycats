@@ -294,11 +294,6 @@ taskwidget = wibox.widget.textbox()
 lain.widgets.contrib.task:attach(taskwidget, {
 })
 
--- Google Calendar
-gcal = lain.widgets.contrib.gcal({
-    calendar = "Jack Shen"
-})
-
 -- Separators
 first = wibox.widget.textbox('<span font="Tamsyn 4"> </span>')
 last = wibox.widget.imagebox()
@@ -572,7 +567,6 @@ globalkeys = awful.util.table.join(
     awful.key({ modkey,           }, "t",      function () lain.widgets.contrib.task:prompt_add() end),
     awful.key({ modkey, "Shift",  }, "t",      function () lain.widgets.contrib.task:prompt_search() end),
     awful.key({ altkey,           }, "t",      function () lain.widgets.contrib.task:show() end),
-    awful.key({ altkey,           }, "g",      function () gcal.show(7) end),
     awful.key({ altkey,           }, "h",      function () fswidget.show(7) end),
 
     -- ALSA volume control
